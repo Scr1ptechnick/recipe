@@ -11,22 +11,53 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.orange,
-        child: Icon(Icons.add, color: Colors.white,),
-        onPressed: (){
+        child: Icon(Icons.add, color: Colors.white),
+        onPressed: () {
           _showBottom(context);
-          }),
+        },
+      ),
     );
   }
 
-  Future<void> _showBottom(BuildContext context){
+  Future<void> _showBottom(BuildContext context) {
     return showModalBottomSheet(
-      context: context, 
-      builder: (contexto) => Container(
-        width: MediaQuery.of(context).size.width,
-        height: 500,
-        color: Colors.white,
-        child: RecipeForm(),
-      )
+      context: context,
+      isScrollControlled: true,
+      builder:
+          (context) => Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.5,
+                ),
+                width: MediaQuery.of(context).size.width,
+                color: Colors.white,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(child: SingleChildScrollView(child: RecipeForm()))
+                  ],
+                )
+              ),
+            ),
+          /*(context) => GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                width: MediaQuery.of(context).size.width,
+                height: 350,
+                //color: Colors.white,
+                child: const RecipeForm(),
+              ),
+            ),
+          ),*/
     );
   }
 
@@ -81,41 +112,117 @@ class RecipeForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _formKey = GlobalKey<FormState>();
+
+    final TextEditingController _recipeName = TextEditingController();
+    final TextEditingController _recipeAuthor = TextEditingController();
+    final TextEditingController _recipeIMG = TextEditingController();
+    final TextEditingController _recipeDescription = TextEditingController();
+
     return Padding(
       padding: EdgeInsets.all(8),
       child: Form(
-        //key: _formKey,
+        key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Add New Recipe', 
-            style: TextStyle(
-              color: Colors.orange,
-              fontSize: 24,
-              ),),
-              SizedBox(height: 16,),
-              _buildTextField(label: 'Recipe Name')
+            Text(
+              'Add New Recipe',
+              style: TextStyle(color: Colors.orange, fontSize: 24),
+            ),
+            SizedBox(height: 16),
+            _buildTextField(
+              controller: _recipeName,
+              label: 'Recipe Name',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter the name recipe';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            _buildTextField(
+              controller: _recipeAuthor,
+              label: 'Author',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter the author';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            _buildTextField(
+              controller: _recipeIMG,
+              label: 'Image URL',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter the image URL';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            _buildTextField(
+              maxLines: 4,
+              controller: _recipeDescription,
+              label: 'Recipe',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter the recipe description';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    Navigator.pop(context);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'Save Recipe',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
           ],
-        ),)
+        ),
+      ),
     );
   }
-  
-  Widget _buildTextField({required String label})  {
-    return  TextFormField(
+
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    required String? Function(String?) validator,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(
-          fontFamily: 'Quicksand',
-          color: Colors.orange,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        labelStyle: TextStyle(fontFamily: 'Quicksand', color: Colors.orange),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.orange, width: 1),
-          borderRadius: BorderRadius.circular(10)
-        ) 
+          borderRadius: BorderRadius.circular(10),
+        ),
       ),
+      validator: validator,
+      maxLines: maxLines,
     );
   }
 }
