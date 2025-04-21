@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:recipe/screens/recipe_detail.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -25,24 +26,24 @@ class HomeScreen extends StatelessWidget {
       isScrollControlled: true,
       builder:
           (context) => Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.5,
               ),
-              child: Container(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.5,
-                ),
-                width: MediaQuery.of(context).size.width,
-                color: Colors.white,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Expanded(child: SingleChildScrollView(child: RecipeForm()))
-                  ],
-                )
+              width: MediaQuery.of(context).size.width,
+              color: Colors.white,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(child: SingleChildScrollView(child: RecipeForm())),
+                ],
               ),
             ),
-          /*(context) => GestureDetector(
+          ),
+      /*(context) => GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () => FocusScope.of(context).unfocus(),
             child: Padding(
@@ -62,44 +63,52 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _RecipesCard(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: 125,
-        child: Card(
-          child: Row(
-            children: <Widget>[
-              Container(
-                height: 125,
-                width: 100,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    'https://newmansown.com/wp-content/uploads/2022/03/Homemade-lasagna.png',
-                    fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => RecipeDetail(recipeName: 'Lasagna')),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: 125,
+          child: Card(
+            child: Row(
+              children: <Widget>[
+                Container(
+                  height: 125,
+                  width: 100,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      'https://newmansown.com/wp-content/uploads/2022/03/Homemade-lasagna.png',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: 26),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Lasagna',
-                    style: TextStyle(fontSize: 16, fontFamily: 'Quicksand'),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Alex Marin',
-                    style: TextStyle(fontSize: 16, fontFamily: 'Quicksand'),
-                  ),
-                  Container(height: 2, width: 75, color: Colors.orange),
-                  SizedBox(height: 4),
-                ],
-              ),
-            ],
+                SizedBox(width: 26),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Lasagna',
+                      style: TextStyle(fontSize: 16, fontFamily: 'Quicksand'),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Alex Marin',
+                      style: TextStyle(fontSize: 16, fontFamily: 'Quicksand'),
+                    ),
+                    Container(height: 2, width: 75, color: Colors.orange),
+                    SizedBox(height: 4),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
