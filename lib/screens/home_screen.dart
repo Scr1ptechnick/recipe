@@ -7,7 +7,10 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   Future<List<dynamic>> FetchRecipes() async {
-    final url = Uri.parse('http://localhost:12346/recipes');
+    // Android 10.0.2.2
+    //IOS 127.0.0.1
+    //WEB http://localhost:12346/recipes
+    final url = Uri.parse('http://10.0.2.2:12346/recipes');
     final response = await http.get(url);
     final data = jsonDecode(response.body);
     return data['recipes'];
@@ -17,11 +20,22 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FetchRecipes();
+    /*FetchRecipes();*/
     return Scaffold(
-      body: Column(
+      body:  FutureBuilder<List<dynamic>>(
+        future: FetchRecipes(), 
+        builder: (context, snapshot){
+          final recipes = snapshot.data ?? [];
+          return ListView.builder(
+            itemCount: recipes.length,
+            itemBuilder: (context, index){
+              return _RecipesCard(context, recipes[index]);
+            });
+        }
+        ),
+     /* body: Column(
         children: <Widget>[_RecipesCard(context), _RecipesCard(context)],
-      ),
+      ),*/
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.orange,
         child: Icon(Icons.add, color: Colors.white),
@@ -74,12 +88,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _RecipesCard(BuildContext context) {
+  Widget _RecipesCard(BuildContext context, dynamic recipe) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => RecipeDetail(recipeName: 'Lasagna')),
+          MaterialPageRoute(builder: (context) => RecipeDetail(recipeName: recipe['name'])),
         );
       },
       child: Padding(
@@ -96,9 +110,23 @@ class HomeScreen extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
-                      'https://newmansown.com/wp-content/uploads/2022/03/Homemade-lasagna.png',
+                      recipe['image_link'],
+                      errorBuilder: (context, error, StackTrace){
+                        return  Container(
+                          color: Colors.grey[200],
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.grey[400],
+                            size: 50,
+                          ),
+                        );
+                      },
                       fit: BoxFit.cover,
                     ),
+                    /*child: Image.network(
+                      'https://newmansown.com/wp-content/uploads/2022/03/Homemade-lasagna.png',
+                      fit: BoxFit.cover,
+                    ),*/
                   ),
                 ),
                 SizedBox(width: 26),
@@ -107,12 +135,12 @@ class HomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      'Lasagna',
+                      recipe['name'],
                       style: TextStyle(fontSize: 16, fontFamily: 'Quicksand'),
                     ),
                     SizedBox(height: 4),
                     Text(
-                      'Alex Marin',
+                      recipe['author'],
                       style: TextStyle(fontSize: 16, fontFamily: 'Quicksand'),
                     ),
                     Container(height: 2, width: 75, color: Colors.orange),
